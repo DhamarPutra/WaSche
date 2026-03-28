@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Schedule WhatsApp Message</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="bg-gray-100 flex items-center justify-center h-screen">
+    <div class="bg-white p-6 rounded-lg shadow-lg w-96">
+      <h2 class="text-xl font-bold mb-4">Schedule WhatsApp Message</h2>
+      <form id="scheduleForm">
+        <div class="mb-4">
+          <label class="block text-gray-700">Nomor WhatsApp</label>
+          <input
+            type="text"
+            id="phone"
+            class="w-full p-2 border rounded"
+            placeholder="Contoh: 628123456789"
+            autocomplete="off"
+          />
+        </div>
+        <div class="mb-4">
+          <label class="block text-gray-700">Pesan</label>
+          <textarea
+            id="message"
+            class="w-full p-2 border rounded"
+            placeholder="Masukkan pesan"
+          ></textarea>
+        </div>
+        <div class="mb-4">
+          <label class="block text-gray-700">Waktu Kirim</label>
+          <input
+            type="datetime-local"
+            id="scheduleTime"
+            class="w-full p-2 border rounded"
+          />
+        </div>
+        <button
+          type="submit"
+          class="bg-blue-500 text-white p-2 rounded w-full mb-4"
+        >
+          Kirim Jadwal
+        </button>
+      </form>
+      <div class="text-center mb-4">
+        <div id="time"></div>
+        <div id="date"></div>
+      </div>
+      <div class="text-center">
+        &copy; 2025 <a href="https://example.com">Fujiwara Creative</a>. All rights
+        reserved.
+      </div>
+    </div>
+
+    <script>
+      document
+        .getElementById("scheduleForm")
+        .addEventListener("submit", async function (event) {
+          event.preventDefault();
+
+          let phone = document.getElementById("phone").value;
+          const message = document.getElementById("message").value;
+          const scheduleTime = document.getElementById("scheduleTime").value;
+
+          if (phone.startsWith("08")) {
+            phone = "628" + phone.substring(2);
+          }
+
+          const response = await fetch("http://127.0.0.1:3000/api/schedule", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ phone, message, scheduleTime }),
+          });
+
+          const result = await response.json();
+          alert(result.message);
+        });
+      function updateClock() {
+        const timeElement = document.getElementById("time");
+        const dateElement = document.getElementById("date");
+
+        // Mendapatkan waktu saat ini
+        const now = new Date();
+
+        // Menampilkan jam, menit, detik
+        let hours = now.getHours();
+        let minutes = now.getMinutes();
+        let seconds = now.getSeconds();
+        let day = now.getDate();
+        let month = now.getMonth() + 1; // Januari = 0
+        let year = now.getFullYear();
+        let dayOfWeek = now.toLocaleString("id-ID", { weekday: "long" });
+
+        // Menambahkan leading zero pada jam, menit, detik jika perlu
+        hours = hours < 10 ? "0" + hours : hours;
+        minutes = minutes < 10 ? "0" + minutes : minutes;
+        seconds = seconds < 10 ? "0" + seconds : seconds;
+
+        // Format waktu
+        timeElement.textContent = `${hours}:${minutes}:${seconds}`;
+
+        // Format tanggal
+        dateElement.textContent = `${dayOfWeek}, ${day}/${month}/${year}`;
+      }
+
+      // Memperbarui jam setiap detik
+      setInterval(updateClock, 1000);
+    </script>
+  </body>
+</html>
